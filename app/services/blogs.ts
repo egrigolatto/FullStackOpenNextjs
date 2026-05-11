@@ -7,9 +7,20 @@ const blogs = [
 let nextId = 4
 
 export const getBlogs = () => {
-  return blogs
+  return [...blogs].sort((a, b) => b.likes - a.likes)
 }
 
 export const addBlog = (titulo: string, autor: string, url: string, likes: number = 0) => {
   blogs.push({ id: nextId++, titulo, autor, url, likes  })
+}
+
+export const getBlogById = (id: number) => {
+  return blogs.find((blog) => blog.id === id)
+}
+
+export const toggleLike = (id: number) => {
+  const blog = blogs.find((blog) => blog.id === id)
+  if (blog) {
+    blog.likes++
+  }
 }

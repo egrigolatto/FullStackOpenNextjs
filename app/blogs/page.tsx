@@ -1,21 +1,48 @@
 import { getBlogs } from "../services/blogs"
+import Link from "next/link"
 
-const Blogs = () => {
-  const blogs = getBlogs()
+const Blogs = async({
+  searchParams,
+}: {
+  searchParams: Promise<{ filter?: string }>
+}) => {
+  const { filter } = await searchParams
+  const allBlogs = getBlogs()
+
+  const blogs = filter?.trim()
+  ? allBlogs.filter(blog =>
+      blog.titulo.toLowerCase().includes(filter.toLowerCase())
+    )
+  : allBlogs
+  
   return (
     <div>
       <h2>Blogs</h2>
-      
+
+      <form method="GET">
+        <input
+          type="text"
+          name="filter"
+          placeholder="Buscar por título..."
+          defaultValue={filter || ""}
+        />
+        <button type="submit">Buscar</button>
+      </form>
+
+      {filter && (
+        <div>
+          <Link href="/blogs">Limpiar búsqueda</Link>
+        </div>
+      )}
+      <ul>
         {blogs.map(blog => (
-          <div key={blog.id} 
-          style={{ marginBottom: "20px" ,border: "1px solid black", padding: "10px" }}
-          >
-            Titulo: {blog.titulo} <br /> 
-            Autor: {blog.autor} <br /> 
-            URL: {blog.url} <br />
-            likes: {blog.likes} <br />
-          </div>
+          <li key={blog.id} >
+            <Link href={`/blogs/${blog.id}`}>
+              {blog.titulo} - {blog.autor}  - {blog.likes} Likes
+            </Link>
+          </li>
         ))}
+        </ul>
     </div>
   )
 }
