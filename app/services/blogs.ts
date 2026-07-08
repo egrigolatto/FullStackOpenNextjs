@@ -3,6 +3,7 @@ import { db } from "../../db"
 import { blogs } from "../../db/schema"
 
 import { ilike, desc } from "drizzle-orm"
+import { getCurrentUser } from "./session"
 
 
 export const getBlogs = async (filterOnly?: string) => {
@@ -24,11 +25,12 @@ export const getBlogById = async (id: number) => {
   })
 }
 export const addBlog = async (titulo: string, autor: string, url: string, likes: number = 0) => {
-  const user = await db.query.users.findFirst({
-    orderBy: sql`RANDOM()`,
-  })
+  const user = await getCurrentUser()
+  if (!user) {
+    throw new Error("Not logged in")
+  }
   
-  return db.insert(blogs).values({ titulo, autor, url, likes, userId: user.id })
+  await db.insert(blogs).values({ titulo, autor, url, likes, userId: user.id })
 }
 export const toggleLike = async (id: number) => {
   const blog = await getBlogById(id)
