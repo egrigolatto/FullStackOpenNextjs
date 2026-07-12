@@ -1,5 +1,6 @@
 import { getBlogs } from "../services/blogs";
 import Link from "next/link";
+import { Suspense } from "react";
 
 const Blogs = async ({
   searchParams,
@@ -42,6 +43,7 @@ const Blogs = async ({
         </div>
       )}
 
+      <Suspense fallback={<p>Loading...</p>}>
       <ul className="space-y-4">
         {blogs.map((blog) => (
           <li
@@ -64,6 +66,7 @@ const Blogs = async ({
           </li>
         ))}
       </ul>
+      </Suspense>
     </div>
   );
 };

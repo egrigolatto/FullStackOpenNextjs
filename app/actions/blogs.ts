@@ -1,10 +1,15 @@
 "use server"
 
 import { redirect } from "next/navigation"
-import { addBlog } from "../services/blogs"
 import { revalidatePath } from "next/cache"
-import { toggleLike } from "../services/blogs"
 import { auth } from "@/auth"
+import {
+  addBlog,
+  addToReadingList,
+  markAsRead,
+  toggleLike,
+} from "../services/blogs"
+
 
 export const createBlog = async (
   prevState: { errors?: Record<string, string>; values?: { titulo?: string; autor?: string; url?: string } },
@@ -55,4 +60,17 @@ export const toggleLikeBlog = async (formData: FormData) => {
   await toggleLike(id)
   revalidatePath(`/blogs/${id}`)
   revalidatePath("/blogs")
+}
+
+export const addBlogToReadingList = async (formData: FormData) => {
+  const blogId = Number(formData.get("blogId"))
+  await addToReadingList(blogId)
+  revalidatePath(`/blogs/${blogId}`)
+  revalidatePath("/me")
+}
+
+export const markBlogAsRead = async (formData: FormData) => {
+  const entryId = Number(formData.get("entryId"))
+  await markAsRead(entryId)
+  revalidatePath("/me")
 }

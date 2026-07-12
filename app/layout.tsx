@@ -3,6 +3,12 @@ import NavBar from "./components/NavBar"
 import { NotificationProvider } from "./components/NotificationContext"
 import Notification from "./components/Notification"
 import "./globals.css"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Blog App",
+  description: "A simple blog app built with Next.js and Drizzle ORM",
+}
 
 export default function RootLayout({
   children,

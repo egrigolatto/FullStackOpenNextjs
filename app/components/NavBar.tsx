@@ -23,6 +23,13 @@ export default function NavBar() {
 
     {session ? (
       <>
+
+        <NavLink
+          href="/me"
+          className="transition hover:text-blue-400"
+        >
+          me
+        </NavLink>
         <NavLink
           href="/blogs/new"
           className="rounded-md bg-green-600 px-3 py-2 text-sm font-medium transition hover:bg-green-700"

@@ -1,9 +1,10 @@
-import { eq, sql } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { db } from "../../db"
-import { blogs } from "../../db/schema"
+import { blogs, readingList } from "../../db/schema"
 
 import { ilike, desc } from "drizzle-orm"
 import { getCurrentUser } from "./session"
+
 
 
 export const getBlogs = async (filterOnly?: string) => {
@@ -42,3 +43,59 @@ export const toggleLike = async (id: number) => {
   }
 }
 
+export const addToReadingList = async (blogId: number) => {
+  const user = await getCurrentUser()
+  if (!user) {
+    throw new Error("Not logged in")
+  }
+
+  const existing = await db.query.readingList.findFirst({
+    where: (fields, { and }) =>
+      and(eq(fields.userId, user.id), eq(fields.blogId, blogId)),
+  })
+
+  if (existing) {
+    return
+  }
+
+  await db.insert(readingList).values({
+    userId: user.id,
+    blogId,
+    read: false,
+  })
+}
+
+export const getReadingList = async () => {
+  const user = await getCurrentUser()
+  if (!user) {
+    return []
+  }
+
+  const entries = await db.query.readingList.findMany({
+    where: eq(readingList.userId, user.id),
+    with: {
+      blog: true,
+    },
+    orderBy: (fields) => fields.id,
+  })
+
+  return entries
+}
+
+export const markAsRead = async (entryId: number) => {
+  await db.update(readingList).set({ read: true }).where(eq(readingList.id, entryId))
+}
+
+export const isBlogInReadingList = async (blogId: number) => {
+  const user = await getCurrentUser()
+  if (!user) {
+    return false
+  }
+
+  const existing = await db.query.readingList.findFirst({
+    where: (fields, { and }) =>
+      and(eq(fields.userId, user.id), eq(fields.blogId, blogId)),
+  })
+
+  return Boolean(existing)
+}
